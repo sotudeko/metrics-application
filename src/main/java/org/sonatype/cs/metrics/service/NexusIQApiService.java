@@ -16,53 +16,55 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class NexusIQApiService {
-	private static final Logger log = LoggerFactory.getLogger(NexusIQApiService.class);
+    private static final Logger log = LoggerFactory.getLogger(NexusIQApiService.class);
 
     @Value("${iq.url}")
-	private String iqUrl;
+    private String iqUrl;
 
     @Value("${iq.user}")
-	private String iqUser;
+    private String iqUser;
 
     @Value("${iq.passwd}")
-	private String iqPasswd;
+    private String iqPasswd;
 
     @Value("${iq.api}")
-	private String iqApi;
-	private Object obj;
+    private String iqApi;
+    private Object obj;
 
-	public Object getData(String endPoint, String objectType) throws IOException {
-		String urlString = iqUrl + iqApi + endPoint;
-		log.info("Fetching data from " + urlString);
+    public Object getData(String endPoint, SendDataToCsvFile aoc, String objectType) throws IOException {
+        String urlString = iqUrl + iqApi + endPoint;
+        log.info("Fetching data from " + urlString);
 
-		URL url = new URL(urlString);
+        URL url = new URL(urlString);
 
-		String authString = iqUser + ":" + iqPasswd;
-		byte[] encodedAuth = Base64.encodeBase64(authString.getBytes(StandardCharsets.ISO_8859_1));
-		String authStringEnc = new String(encodedAuth);
+        String authString = iqUser + ":" + iqPasswd;
+        byte[] encodedAuth = Base64.encodeBase64(authString.getBytes(StandardCharsets.ISO_8859_1));
+        String authStringEnc = new String(encodedAuth);
 
-		URLConnection urlConnection = url.openConnection();
-		urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+        URLConnection urlConnection = url.openConnection();
+        urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 
-		try {
-			InputStream is = urlConnection.getInputStream();
-			JsonReader reader = Json.createReader(is);
+        try {
+            InputStream is = urlConnection.getInputStream();
+            JsonReader reader = Json.createReader(is);
 
-			switch (objectType){
-				case "object": obj = reader.readObject(); break;
-				case "array": obj = reader.readArray(); break;
-				default:
-					throw new IllegalStateException("Unexpected value: " + objectType);
-			}
+            switch (objectType){
+                case "object": obj = reader.readObject(); break;
+                case "array": obj = reader.readArray(); break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + objectType);
+            }
 
-			reader.close();
+            aoc.makeCsvFile(obj);
+            reader.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		//System.out.println(obj);
-		return obj;
-	}
+        //System.out.println(obj);
+        return obj;
+    }
 }
+
+
