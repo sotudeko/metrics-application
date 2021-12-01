@@ -10,7 +10,9 @@ import javax.json.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.cs.metrics.domain.ApplicationEvaluations;
-import org.sonatype.cs.metrics.service.NexusIQApiService;
+import org.sonatype.cs.metrics.service.ApiObjectToCsv;
+import org.sonatype.cs.metrics.service.ApplicationEvaluation;
+import org.sonatype.cs.metrics.service.NexusIQApiService3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -21,7 +23,10 @@ public class MetricsApplication implements CommandLineRunner{
 	private static final Logger log = LoggerFactory.getLogger(MetricsApplication.class);
 
 	@Autowired
-	private NexusIQApiService nexusIQApiService;
+	private NexusIQApiService3 nexusIQApiService3;
+
+	@Autowired
+	private ApplicationEvaluations applicationEvaluations;
 
 	public static void main(String[] args) {
 		SpringApplication.run(MetricsApplication.class, args);
@@ -31,26 +36,11 @@ public class MetricsApplication implements CommandLineRunner{
 	public void run(String... args) throws Exception {
 		log.info("Running MetricsApplication");
 
+		//applicationEvaluations.makeCsvFile();
+		//ApiObjectToCsv aoc = new ApplicationEvaluation();
+		nexusIQApiService3.getData("/reports/applications", "array", new ApplicationEvaluation());
 
-//		try (
-//				InputStream is = nexusIQApiService.getData("/organizations");
-//				JsonReader rdr = Json.createReader(is)) {
-//
-//				JsonObject obj = rdr.readObject();
-//				System.out.println(obj.toString());
-//				JsonArray results = obj.getJsonArray("organizations");
-//
-//				for (JsonObject result : results.getValuesAs(JsonObject.class)) {
-//					//System.out.print(result.getJsonObject("from").getString("name"));
-//					//System.out.print(": ");
-//					//System.out.println(result.getString("message", ""));
-//					//System.out.println("-----------");
-//
-//					String id = result.getString("id");
-//					String oname = result.getString("name");
-//					System.out.println(id + " -> " + oname);
-//				}
-//			}
+
 		
 
 	}

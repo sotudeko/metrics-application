@@ -29,8 +29,9 @@ public class NexusIQApiService {
 
     @Value("${iq.api}")
 	private String iqApi;
+	private Object obj;
 
-    public InputStream getData(String endPoint) throws IOException {
+	public Object getData(String endPoint, String objectType) throws IOException {
 		String urlString = iqUrl + iqApi + endPoint;
 		log.info("Fetching data from " + urlString);
 
@@ -43,11 +44,25 @@ public class NexusIQApiService {
 		URLConnection urlConnection = url.openConnection();
 		urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 
-		try (InputStream is = urlConnection.getInputStream();
-			 rdr = Json.createReader(is)) {
+		try {
+			InputStream is = urlConnection.getInputStream();
+			JsonReader reader = Json.createReader(is);
+
+			switch (objectType){
+				case "object": obj = reader.readObject(); break;
+				case "array": obj = reader.readArray(); break;
+				default:
+					throw new IllegalStateException("Unexpected value: " + objectType);
+			}
+
+			reader.close();
 
 		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		return null;
+		//System.out.println(obj);
+		return obj;
 	}
 }
