@@ -90,24 +90,31 @@ public class NexusIQAPIStreamService {
 
         Event event = parser.next();  // advance past START_OBJECT
         String key = parser.getString();
+
         event = parser.next();       // advance past KEY_NAME
+
         while (!event.equals(Event.END_OBJECT)) {
             if (event.equals(Event.VALUE_STRING)) {
                 String value = parser.getString();
 
                 // if key is what we need
                 map.put(key, value);
-            } else if (event.equals(Event.VALUE_NUMBER)) {
+            }
+            else if (event.equals(Event.VALUE_NUMBER)) {
                 Integer value = parser.getInt();
                 map.put(key, value);
-            } else if (event.equals(Event.START_ARRAY)) {
+            }
+            else if (event.equals(Event.START_ARRAY)) {
                 ArrayList<String> list = getList(parser);
                 map.put(key, list);
             }
+
             event = parser.next();
+
             if (event.equals(Event.END_OBJECT)) {
                 break;
             }
+
             key = parser.getString();
             event = parser.next();
         }
@@ -120,20 +127,24 @@ public class NexusIQAPIStreamService {
     public static ArrayList getList(JsonParser parser) {
         ArrayList list = new ArrayList();
         Event event = parser.next();  // advance past START_ARRAY
+
         while (!event.equals(Event.END_ARRAY)) {
             if (event.equals(Event.VALUE_STRING)) {
                 list.add(parser.getString());
                 event = parser.next();
-            } else if (event.equals(Event.START_OBJECT)) {
+            }
+            else if (event.equals(Event.START_OBJECT)) {
                 HashMap<String,Object> map = getMap(parser);
                 list.add(map);
                 event = parser.next();
-            } else if (event.equals(Event.START_ARRAY)) {
+            }
+            else if (event.equals(Event.START_ARRAY)) {
                 ArrayList subList = getList(parser);   //  recursion
                 list.add(subList);
                 event = parser.next();
             }
         }
+
         return list;
     }
 }
