@@ -1,5 +1,8 @@
 package org.sonatype.cs.metrics.service;
 
+import java.io.BufferedWriter;
+
 public interface SendDataToCsvFile {
-    default void makeCsvFile(Object obj) {}
+    //public void makeCsvFile(Object obj, String header, String csvfile);
+    public void writeCsvFile(BufferedWriter writer, Object obj);
 }

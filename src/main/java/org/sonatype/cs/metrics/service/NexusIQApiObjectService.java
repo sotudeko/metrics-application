@@ -1,12 +1,14 @@
 package org.sonatype.cs.metrics.service;
 
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +17,8 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
 @Service
-public class NexusIQApiService {
-    private static final Logger log = LoggerFactory.getLogger(NexusIQApiService.class);
+public class NexusIQApiObjectService {
+    private static final Logger log = LoggerFactory.getLogger(NexusIQApiObjectService.class);
 
     @Value("${iq.url}")
     private String iqUrl;
@@ -29,9 +31,13 @@ public class NexusIQApiService {
 
     @Value("${iq.api}")
     private String iqApi;
-    private Object obj;
 
-    public Object getData(String endPoint, SendDataToCsvFile aoc, String objectType) throws IOException {
+    @Autowired
+    private CsvFileService csvFileService;
+
+    private JsonObject obj;
+
+    public JsonObject getData(String endPoint, SendDataToCsvFile aoc, String csvfile, String[] header) throws IOException {
         String urlString = iqUrl + iqApi + endPoint;
         log.info("Fetching data from " + urlString);
 
@@ -47,15 +53,8 @@ public class NexusIQApiService {
         try {
             InputStream is = urlConnection.getInputStream();
             JsonReader reader = Json.createReader(is);
-
-            switch (objectType){
-                case "object": obj = reader.readObject(); break;
-                case "array": obj = reader.readArray(); break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + objectType);
-            }
-
-            aoc.makeCsvFile(obj);
+            obj = reader.readObject();
+            csvFileService.makeFile(aoc, obj, csvfile, header);
             reader.close();
         }
         catch (IOException e) {
