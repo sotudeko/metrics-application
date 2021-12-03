@@ -11,29 +11,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class ComponentWaivers implements SendDataToCsvFile {
     private static final Logger log = LoggerFactory.getLogger(ComponentWaivers.class);
 
     @Override
-    public void writeCsvFile(BufferedWriter writer, Object obj) {
-        log.info("Writing ComponentWaivers report");
-
-        JsonArray results = (JsonArray) obj;
-
-        for (JsonObject result : results.getValuesAs(JsonObject.class)) {
-
-//            String applicationWaivers = result.getString("stage");
-//
-//            String[] line = {applicationName, evaluationDate, stage};
-//
-//            try {
-//                writer.write(String.join(",", Arrays.asList(line)));
-//                writer.newLine();
-//            }
-//            catch (IOException e) {
-//                e.printStackTrace();
-//            }
-        }
+    public String[] getLine(HashMap<String, Object> map) {
+        return new String[0];
     }
 }

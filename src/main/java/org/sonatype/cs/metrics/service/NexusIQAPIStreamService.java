@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static javax.json.stream.JsonParser.Event.*;
@@ -56,19 +57,31 @@ public class NexusIQAPIStreamService {
         URLConnection urlConnection = url.openConnection();
         urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 
+        BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvfile));
+        writer.write(String.join(",", header));
+        writer.newLine();
+
         try (InputStream is = urlConnection.getInputStream();
              JsonParser parser = Json.createParser(is)) {
-
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvfile));
-            writer.write(String.join(",", header));
-            writer.newLine();
-
+            
             Event event = parser.next();  // advance past START_OBJECT
             event = parser.next();
 
             while (!event.equals(Event.END_OBJECT) && parser.hasNext()) {
                 HashMap<String, Object> map = getMap(parser);
-                System.out.println(map);
+
+                //System.out.println(map);
+                String[] line = aoc.getLine(map);
+                //System.out.println(line.toString());
+
+                try {
+                    writer.write(String.join(",", Arrays.asList(line)));
+                    writer.newLine();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 event = parser.next();
             }
 
@@ -80,6 +93,8 @@ public class NexusIQAPIStreamService {
         catch (IOException e) {
             System.out.println(e);
         }
+
+        log.info(csvfile);
     }
 
     /*  Returns the HashMap parsed by the specified parser.

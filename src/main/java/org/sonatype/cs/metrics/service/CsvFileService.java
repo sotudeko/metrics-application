@@ -18,20 +18,20 @@ public class CsvFileService {
 
     public void makeFile(SendDataToCsvFile aoc, Object obj, String csvfile, String[] header) {
 
-        try {
-
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvfile));
-            writer.write(String.join(",", header));
-            writer.newLine();
-
-            aoc.writeCsvFile(writer, obj);
-
-            writer.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        log.info(csvfile);
+//        try {
+//
+//            BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvfile));
+//            writer.write(String.join(",", header));
+//            writer.newLine();
+//
+//            aoc.writeCsvFile(writer, obj);
+//
+//            writer.close();
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        log.info(csvfile);
     }
 }
