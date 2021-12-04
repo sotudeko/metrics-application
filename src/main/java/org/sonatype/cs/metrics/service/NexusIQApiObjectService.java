@@ -10,11 +10,15 @@ import org.slf4j.LoggerFactory;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 
 @Service
 public class NexusIQApiObjectService {
@@ -35,9 +39,8 @@ public class NexusIQApiObjectService {
     @Autowired
     private CsvFileService csvFileService;
 
-    private JsonObject obj;
 
-    public JsonObject getData(String endPoint, SendDataToCsvFile aoc, String csvfile, String[] header) throws IOException {
+    public JsonObject getData(String endPoint, MapToCsv aoc, String csvfile, String[] header) throws IOException {
         String urlString = iqUrl + iqApi + endPoint;
         log.info("Fetching data from " + urlString);
 
@@ -50,11 +53,18 @@ public class NexusIQApiObjectService {
         URLConnection urlConnection = url.openConnection();
         urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 
+        BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvfile));
+        writer.write(String.join(",", header));
+        writer.newLine();
+
+        JsonObject obj = null;
+        HashMap<String,Object> map = new HashMap();
+
         try {
             InputStream is = urlConnection.getInputStream();
             JsonReader reader = Json.createReader(is);
             obj = reader.readObject();
-            csvFileService.makeFile(aoc, obj, csvfile, header);
+
             reader.close();
         }
         catch (IOException e) {

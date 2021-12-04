@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static javax.json.stream.JsonParser.Event.*;
-
 @Service
-public class NexusIQAPIStreamService {
-    private static final Logger log = LoggerFactory.getLogger(NexusIQAPIStreamService.class);
+public class DataStreamService {
+    private static final Logger log = LoggerFactory.getLogger(DataStreamService.class);
 
     @Value("${iq.url}")
     private String iqUrl;
@@ -44,7 +42,7 @@ public class NexusIQAPIStreamService {
     @Autowired
     private CsvFileService csvFileService;
 
-    public void getData(String endPoint, SendDataToCsvFile aoc, String csvfile, String[] header) throws IOException {
+    public void getData(String endPoint, MapToCsv aoc, String csvfile, String[] header, boolean fastForward) throws IOException {
         String urlString = iqUrl + iqApi + endPoint;
         log.info("Fetching data from " + urlString);
 
@@ -57,22 +55,33 @@ public class NexusIQAPIStreamService {
         URLConnection urlConnection = url.openConnection();
         urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
 
-        BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvfile));
-        writer.write(String.join(",", header));
-        writer.newLine();
-
         try (InputStream is = urlConnection.getInputStream();
              JsonParser parser = Json.createParser(is)) {
-            
+
             Event event = parser.next();  // advance past START_OBJECT
+            //log.info("1st event: " + event.name());
+
             event = parser.next();
+            //log.info("2nd event: " + event.name());
+
+            // organizations - start
+            if (fastForward) {
+                event = parser.next();
+                //log.info("3rd event: " + event.name());
+
+                event = parser.next();
+                //log.info("4th event: " + event.name());
+            }
+            // organizations - end
+
+            BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvfile));
+            writer.write(String.join(",", header));
+            writer.newLine();
 
             while (!event.equals(Event.END_OBJECT) && parser.hasNext()) {
-                HashMap<String, Object> map = getMap(parser);
 
-                //System.out.println(map);
+                HashMap<String, Object> map = getMap(parser);
                 String[] line = aoc.getLine(map);
-                //System.out.println(line.toString());
 
                 try {
                     writer.write(String.join(",", Arrays.asList(line)));
@@ -83,6 +92,11 @@ public class NexusIQAPIStreamService {
                 }
 
                 event = parser.next();
+                //log.info("main loop event: " + event.name());
+
+                if (event.equals(Event.END_ARRAY)){
+                    break;
+                }
             }
 
             is.close();

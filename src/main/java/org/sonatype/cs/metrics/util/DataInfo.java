@@ -13,4 +13,7 @@ public class DataInfo {
 
     public static final String releaseQuarantineSummarCsvFile = "application_evaluations.csv";
     public static final String[] releaseQuarantineSummarFileHeader = {"Application Name", "Evaluation Date", "Stage"};
+
+    public static final String organizationsCsvFile = "organizations.csv";
+    public static final String[] organizationsFileHeader = {"Id", "Name"};
 }

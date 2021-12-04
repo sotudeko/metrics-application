@@ -2,16 +2,11 @@ package org.sonatype.cs.metrics.reports;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.cs.metrics.service.SendDataToCsvFile;
+import org.sonatype.cs.metrics.service.MapToCsv;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 
-public class ApplicationEvaluations implements SendDataToCsvFile {
+public class ApplicationEvaluations implements MapToCsv {
     private static final Logger log = LoggerFactory.getLogger(ApplicationEvaluations.class);
 
 //    @Override
@@ -50,6 +45,8 @@ public class ApplicationEvaluations implements SendDataToCsvFile {
         String applicationName = reportDataUrl.split("/")[3];
 
         String[] line = {applicationName, evaluationDate, stage};
+
+        log.info("ae-> " + stage + ":" + applicationName + ":" + evaluationDate);
 
         return line;
 

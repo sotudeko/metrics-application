@@ -38,7 +38,7 @@ public class NexusIQAPIArrayService {
 
     private JsonArray obj;
 
-    public JsonArray getData(String endPoint, SendDataToCsvFile aoc, String csvfile, String[] header) throws IOException {
+    public JsonArray getData(String endPoint, MapToCsv aoc, String csvfile, String[] header) throws IOException {
         String urlString = iqUrl + iqApi + endPoint;
         log.info("Fetching data from " + urlString);
 
