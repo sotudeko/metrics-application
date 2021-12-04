@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 @Service
-public class DataStreamService {
-    private static final Logger log = LoggerFactory.getLogger(DataStreamService.class);
+public class ArrayStreamService {
+    private static final Logger log = LoggerFactory.getLogger(ArrayStreamService.class);
 
     @Value("${iq.url}")
     private String iqUrl;
@@ -64,37 +64,48 @@ public class DataStreamService {
             event = parser.next();
             log.info("2nd event: " + event.name());
 
-            // organizations - start
+            // fast forward - start
             if (fastForward) {
                 event = parser.next();
                 log.info("3rd event: " + event.name());
 
-                event = parser.next();
-                log.info("4th event: " + event.name());
+//                event = parser.next();
+//                log.info("4th event: " + event.name());
             }
-            // organizations - end
+            // fast forward - end
 
             BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvfile));
             writer.write(String.join(",", header));
             writer.newLine();
 
-            while (!event.equals(Event.END_ARRAY) && parser.hasNext()) {
+            while (!event.equals(Event.END_OBJECT) && parser.hasNext()) {
                 log.info("while-start-loop: " + event.name());
 
-                HashMap<String, Object> map = getMap(parser);
-                String[] line = aoc.getLine(map);
+                //HashMap<String, Object> map = getMap(parser);
+                log.info("get list");
+                ArrayList<String> list = getList(parser);
 
-                try {
-                    writer.write(String.join(",", Arrays.asList(line)));
-                    writer.newLine();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
+                //String[] line = aoc.getLine(map);
+
+//                try {
+//                    writer.write(String.join(",", Arrays.asList(line)));
+//                    writer.newLine();
+//                }
+//                catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 
                 event = parser.next();
                 log.info("in loop event: " + event.name());
 
+                if (event.equals(Event.END_ARRAY)){
+                    break;
+                }
+
+//                if (event.equals(Event.START_ARRAY)){
+//                    event = parser.next();
+//                    event = parser.next();
+//                }
             }
 
             is.close();
@@ -120,7 +131,7 @@ public class DataStreamService {
 
         event = parser.next();       // advance past KEY_NAME
 
-        while (!event.equals(Event.END_OBJECT)) {
+        while (!event.equals(Event.END_ARRAY)) {
             if (event.equals(Event.VALUE_STRING)) {
                 String value = parser.getString();
 
@@ -139,7 +150,8 @@ public class DataStreamService {
             event = parser.next();
 
             if (event.equals(Event.END_OBJECT)) {
-                break;
+                event = parser.next();
+                //break;
             }
 
             key = parser.getString();

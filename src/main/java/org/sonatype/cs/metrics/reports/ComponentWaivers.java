@@ -11,6 +11,13 @@ public class ComponentWaivers implements MapToCsv {
 
     @Override
     public String[] getLine(HashMap<String, Object> map) {
-        return new String[0];
+
+        String publicId = (String) map.get("publicId");
+
+        String[] line = {publicId};
+
+        log.info("pv-> " + publicId);
+
+        return line;
     }
 }

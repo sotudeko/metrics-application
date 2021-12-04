@@ -8,7 +8,7 @@ public class DataInfo {
     public static final String applicationEvaluationsCsvFile = "application_evaluations.csv";
     public static final String[] applicationEvaluationsFileHeader = {"Application Name", "Evaluation Date", "Stage"};
 
-    public static final String[] componentWaiversHeader = {"Application Name", "Stage", "Package Url", "Policy Name", "Threat Level", "Comment", "Create Date", "Expiry Time"};
+    public static final String[] componentWaiversFileHeader = {"Application Name", "Stage", "Package Url", "Policy Name", "Threat Level", "Comment", "Create Date", "Expiry Time"};
     public static final String componentWaiversCsvFile = "component_waivers.csv";
 
     public static final String releaseQuarantineSummarCsvFile = "application_evaluations.csv";
